@@ -73,7 +73,6 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
 
     // Drop targets
     private ButtonDropTarget mInfoDropTarget;
-    private ButtonDropTarget mDeleteDropTarget;
     private ButtonDropTarget mUninstallDropTarget;
 
     public SearchDropTargetBar(Context context, AttributeSet attrs) {
@@ -88,18 +87,14 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
         mLauncher = launcher;
 
         dragController.addDragListener(this);
-        dragController.setFlingToDeleteDropTarget(mDeleteDropTarget);
 
         dragController.addDragListener(mInfoDropTarget);
-        dragController.addDragListener(mDeleteDropTarget);
         dragController.addDragListener(mUninstallDropTarget);
 
         dragController.addDropTarget(mInfoDropTarget);
-        dragController.addDropTarget(mDeleteDropTarget);
         dragController.addDropTarget(mUninstallDropTarget);
 
         mInfoDropTarget.setLauncher(launcher);
-        mDeleteDropTarget.setLauncher(launcher);
         mUninstallDropTarget.setLauncher(launcher);
     }
 
@@ -110,11 +105,9 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
         // Get the individual components
         mDropTargetBar = findViewById(R.id.drag_target_bar);
         mInfoDropTarget = (ButtonDropTarget) mDropTargetBar.findViewById(R.id.info_target_text);
-        mDeleteDropTarget = (ButtonDropTarget) mDropTargetBar.findViewById(R.id.delete_target_text);
         mUninstallDropTarget = (ButtonDropTarget) mDropTargetBar.findViewById(R.id.uninstall_target_text);
 
         mInfoDropTarget.setSearchDropTargetBar(this);
-        mDeleteDropTarget.setSearchDropTargetBar(this);
         mUninstallDropTarget.setSearchDropTargetBar(this);
 
         // Create the various fade animations
@@ -276,7 +269,6 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
             mQSB.setVisibility(enable ? View.GONE : View.VISIBLE);
         }
         mInfoDropTarget.enableAccessibleDrag(enable);
-        mDeleteDropTarget.enableAccessibleDrag(enable);
         mUninstallDropTarget.enableAccessibleDrag(enable);
     }
 }

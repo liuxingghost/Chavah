@@ -618,6 +618,8 @@ public class Launcher extends Activity
         IntentFilter searchBarVisibilityFilter = new IntentFilter(
                 SettingsPinnedHeaderAdapter.ACTION_SEARCH_BAR_VISIBILITY_CHANGED);
         registerReceiver(searchBarVisibilityChangedReceiver, searchBarVisibilityFilter);
+
+
     }
 
     @Override
@@ -1611,8 +1613,7 @@ public class Launcher extends Activity
         dragController.addDragListener(mWorkspace);
 
         // Get the search/delete bar
-        mSearchDropTargetBar = (SearchDropTargetBar)
-                mDragLayer.findViewById(R.id.search_drop_target_bar);
+        mSearchDropTargetBar = (SearchDropTargetBar) mDragLayer.findViewById(R.id.search_drop_target_bar);
 
         // Setup Apps and Widgets
         mAppsView = (AllAppsContainerView) findViewById(R.id.apps_view);
@@ -3029,8 +3030,7 @@ public class Launcher extends Activity
     protected void onLongClickAllAppsButton(View v) {
         if (LOGD) Log.d(TAG, "onLongClickAllAppsButton");
         if (!isAppsViewVisible()) {
-            showAppsView(true /* animated */, false /* resetListToTop */,
-                    true /* updatePredictedApps */, true /* focusSearchBar */);
+            showAppsView(true /* animated */, false /* resetListToTop */,true /* updatePredictedApps */, true /* focusSearchBar */);
         }
     }
 

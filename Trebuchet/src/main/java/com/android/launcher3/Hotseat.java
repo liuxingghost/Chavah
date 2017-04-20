@@ -108,11 +108,10 @@ public class Hotseat extends FrameLayout
         mContent.removeAllViewsInLayout();
 
         // Add the Apps button
-        Context context = getContext();
+        /*Context context = getContext();
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        TextView allAppsButton = (TextView)
-                inflater.inflate(R.layout.all_apps_button, mContent, false);
+        TextView allAppsButton = (TextView) inflater.inflate(R.layout.all_apps_button, mContent, false);
         Drawable d = context.getResources().getDrawable(R.drawable.all_apps_button_icon);
 
         mLauncher.resizeIconDrawable(d);
@@ -134,7 +133,7 @@ public class Hotseat extends FrameLayout
         int y = getCellYFromOrder(mAllAppsButtonRank);
         CellLayout.LayoutParams lp = new CellLayout.LayoutParams(x,y,1,1);
         lp.canReorder = false;
-        mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);
+        mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);*/
     }
 
     @Override
