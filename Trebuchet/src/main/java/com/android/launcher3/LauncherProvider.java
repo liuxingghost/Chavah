@@ -397,12 +397,10 @@ public class LauncherProvider extends ContentProvider {
             // previous versions of launcher.
             createEmptyDB();
             // Populate favorites table with initial favorites
-            if ((mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(), loader) <= 0)
-                    && usingExternallyProvidedLayout) {
+            if ((mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(), loader) <= 0) && usingExternallyProvidedLayout) {
                 // Unable to load external layout. Cleanup and load the internal layout.
                 createEmptyDB();
-                mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(),
-                        getDefaultLayoutParser());
+                mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(), getDefaultLayoutParser());
             }
             clearFlagEmptyDbCreated();
         }
@@ -443,10 +441,8 @@ public class LauncherProvider extends ContentProvider {
     }
 
     private DefaultLayoutParser getDefaultLayoutParser() {
-        int defaultLayout = LauncherAppState.getInstance()
-                .getInvariantDeviceProfile().defaultLayoutId;
-        return new DefaultLayoutParser(getContext(), mOpenHelper.mAppWidgetHost,
-                mOpenHelper, getContext().getResources(), defaultLayout);
+        int defaultLayout = LauncherAppState.getInstance().getInvariantDeviceProfile().defaultLayoutId;
+        return new DefaultLayoutParser(getContext(), mOpenHelper.mAppWidgetHost, mOpenHelper, getContext().getResources(), defaultLayout);
     }
 
     public void migrateLauncher2Shortcuts() {
@@ -517,7 +513,7 @@ public class LauncherProvider extends ContentProvider {
                     UserHandleCompat.myUserHandle());
 
             db.execSQL("CREATE TABLE favorites (" +
-                    "_id INTEGER PRIMARY KEY," +
+                    "_id INTEGER PRIMARY KEY autoincrement," +
                     "title TEXT," +
                     "intent TEXT," +
                     "container INTEGER," +
@@ -544,6 +540,7 @@ public class LauncherProvider extends ContentProvider {
                     "options INTEGER NOT NULL DEFAULT 0," +
                     "subType INTEGER DEFAULT 0" +
                     ");");
+
             addWorkspacesTable(db);
 
             // Database was just created, so wipe any previous widgets

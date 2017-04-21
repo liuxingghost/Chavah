@@ -32,8 +32,6 @@ public class Hotseat extends FrameLayout
 
     private Launcher mLauncher;
 
-    private int mAllAppsButtonRank;
-
     private final boolean mHasVerticalHotseat;
 
     public Hotseat(Context context) {
@@ -83,16 +81,11 @@ public class Hotseat extends FrameLayout
         return mHasVerticalHotseat ? (mContent.getCountY() - (rank + 1)) : 0;
     }
 
-    public boolean isAllAppsButtonRank(int rank) {
-        return rank == mAllAppsButtonRank;
-    }
-
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
         DeviceProfile grid = mLauncher.getDeviceProfile();
 
-        mAllAppsButtonRank = grid.inv.hotseatAllAppsRank;
         mContent = (CellLayout) findViewById(R.id.layout);
         if (grid.isLandscape && !grid.isLargeTablet) {
             mContent.setGridSize(1, (int) grid.inv.numHotseatIcons);
@@ -105,10 +98,10 @@ public class Hotseat extends FrameLayout
     }
 
     void resetLayout() {
-        mContent.removeAllViewsInLayout();
+        /*mContent.removeAllViewsInLayout();
 
         // Add the Apps button
-        /*Context context = getContext();
+        Context context = getContext();
 
         LayoutInflater inflater = LayoutInflater.from(context);
         TextView allAppsButton = (TextView) inflater.inflate(R.layout.all_apps_button, mContent, false);

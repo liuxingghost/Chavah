@@ -4646,9 +4646,6 @@ public class Launcher extends Activity
     }
 
     public boolean isAllAppsButtonRank(int rank) {
-        if (mHotseat != null) {
-            return mHotseat.isAllAppsButtonRank(rank);
-        }
         return false;
     }
 

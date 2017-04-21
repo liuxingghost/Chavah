@@ -2512,10 +2512,6 @@ public class Workspace extends PagedView
                 boolean isHotseat = mLauncher.isHotseatLayout(dropTargetLayout);
                 if (mTargetCell != null && isHotseat) {
                     Hotseat hotseat = mLauncher.getHotseat();
-                    if (hotseat.isAllAppsButtonRank(
-                            hotseat.getOrderInHotseat(mTargetCell[0], mTargetCell[1]))) {
-                        return false;
-                    }
                 }
 
                 mLauncher.showOutOfSpaceMessage(isHotseat);
