@@ -30,7 +30,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
@@ -76,6 +75,9 @@ public class LauncherProvider extends ContentProvider {
     static final String TABLE_FAVORITES = LauncherSettings.Favorites.TABLE_NAME;
     static final String TABLE_WORKSPACE_SCREENS = LauncherSettings.WorkspaceScreens.TABLE_NAME;
     static final String EMPTY_DATABASE_CREATED = "EMPTY_DATABASE_CREATED";
+
+    static int MAX_CELL_X=5;
+    static int MAX_CELL_Y=5;
 
     private static final String RESTRICTION_PACKAGE_NAME = "workspace.configuration.package.name";
 
@@ -396,54 +398,85 @@ public class LauncherProvider extends ContentProvider {
             // previous versions of launcher.
             createEmptyDB();
             // Populate favorites table with initial favorites
-            if ((mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(), loader) <= 0) && usingExternallyProvidedLayout) {
+            //if ((mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(), loader) <= 0) && usingExternallyProvidedLayout) {
                 // Unable to load external layout. Cleanup and load the internal layout.
                 //createEmptyDB();
                 //mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(), getDefaultLayoutParser());
-            }
+            //}
 
-            //Fetch all apps
+            //Получаем список всех приложений
+            /*
+             !!!Внимание опытным путем выяснено что вначале нужно создать хотя бы один значак а потом добавлять экран!!!
+                то тоесть нельзя создать экран пока он пустой
+              */
             Intent startupIntent = new Intent(Intent.ACTION_MAIN);
             startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-
             PackageManager pm = getContext().getPackageManager();
             List<ResolveInfo> activities = pm.queryIntentActivities(startupIntent, 0);
 
-            Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(0).activityInfo.packageName, activities.get(0).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            ContentValues contentValues=generateContentValues(19,activities.get(0).loadLabel(pm).toString(),intent);
-            dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_FAVORITES,null,contentValues);
-            //db.insert(TABLE_FAVORITES,null,contentValues);
-            //insertAndCheck(db,contentValues);
-
-            /*for(int i=0;i<activities.size();i++){
+            //Вначале добавляем ярлыки на нижнию панель
+            for(int i=0;i<Math.min(MAX_CELL_X,activities.size());i++){
                 Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(i).activityInfo.packageName, activities.get(i).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                ContentValues contentValues=generateContentValues(activities.get(i).loadLabel(pm).toString(),intent);
-                //db.insert("favorites",null,contentValues);
-                insertAndCheck(db,contentValues);
+                ContentValues contentValues=generateContentValues(getMaxId(mOpenHelper.getWritableDatabase(),TABLE_FAVORITES)+1,activities.get(i).loadLabel(pm).toString(),intent,i,i,0,Favorites.CONTAINER_HOTSEAT);
+                dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_FAVORITES,null,contentValues);
             }
-            ///////////////////////////////
-            */
+
+            //Начинаем добавлять все приложения на рабочий стол
+            int screen=1;
+            int cellX=0;
+            int cellY=0;
+
+            for(int i=MAX_CELL_X;i<activities.size();i++){
+                Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(i).activityInfo.packageName, activities.get(i).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ContentValues contentValues=generateContentValues(getMaxId(mOpenHelper.getWritableDatabase(),TABLE_FAVORITES)+1,activities.get(i).loadLabel(pm).toString(),intent,screen,cellX,cellY,Favorites.CONTAINER_DESKTOP);
+                dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_FAVORITES,null,contentValues);
+
+                //Если мы заполнили экран добавляем экран и обнуляем значения расположений новых значков
+                if(cellX==MAX_CELL_X-1 && cellY==MAX_CELL_Y-1){
+                    cellX=0;
+                    cellY=0;
+                    dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_WORKSPACE_SCREENS,null,generateWorkSpaceContentValues(screen));
+                    screen++;
+                }
+                //Если мы долши до правого края экрана
+                else if(cellX==MAX_CELL_X-1){
+                    cellX=0;
+                    cellY++;
+                }
+                //Если ничего из вышеперечисленного не произошло
+                else{
+                    cellX++;
+                }
+            }
+            //Проверяем не осталось ли не добавленных ярлыков
+            //Здесь все просто, если мы только что перешли на новый экран то cellX и cellY должы быть равны 0
+            //Если это не так то это означает лишь что есть еще не сгенерированный экран
+            dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_WORKSPACE_SCREENS,null,generateWorkSpaceContentValues(screen));
+            screen++;
+
             clearFlagEmptyDbCreated();
         }
     }
+    //Функция генерирует ContentValues для нового экрана
     private ContentValues generateWorkSpaceContentValues(long id) {
         ContentValues contentValues=new ContentValues();
         contentValues.put(LauncherSettings.WorkspaceScreens._ID,id);
         contentValues.put(LauncherSettings.WorkspaceScreens.SCREEN_RANK,id-1);
         return contentValues;
     }
-    private ContentValues generateContentValues(long id,String title, Intent intent) {
+    //Функция генерирует ContentValues для нового ярлыка
+    private ContentValues generateContentValues(long id,String title, Intent intent,long screen,long cellx,long celly,long container) {
         ContentValues contentValues=new ContentValues();
         contentValues.put(Favorites._ID,id);
         contentValues.put(Favorites.INTENT, intent.toUri(0));
         contentValues.put(Favorites.TITLE, title);
-        contentValues.put(Favorites.SCREEN,2);
-        contentValues.put(Favorites.CELLX,3);
-        contentValues.put(Favorites.CELLY,4);
+        contentValues.put(Favorites.SCREEN,screen);
+        contentValues.put(Favorites.CELLX,cellx);
+        contentValues.put(Favorites.CELLY,celly);
         contentValues.put(Favorites.SPANX,1);
         contentValues.put(Favorites.SPANY,1);
         contentValues.put(Favorites.ITEM_TYPE,0);
-        contentValues.put(Favorites.CONTAINER,Favorites.CONTAINER_DESKTOP);
+        contentValues.put(Favorites.CONTAINER,container);
         return contentValues;
     }
 
