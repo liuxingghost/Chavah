@@ -209,8 +209,7 @@ public class AutoInstallsLayout {
         HashMap<String, TagParser> tagParserMap = getLayoutElementsMap();
         int count = 0;
 
-        while (((type = parser.next()) != XmlPullParser.END_TAG ||
-                parser.getDepth() > depth) && type != XmlPullParser.END_DOCUMENT) {
+        while (((type = parser.next()) != XmlPullParser.END_TAG || parser.getDepth() > depth) && type != XmlPullParser.END_DOCUMENT) {
             if (type != XmlPullParser.START_TAG) {
                 continue;
             }
