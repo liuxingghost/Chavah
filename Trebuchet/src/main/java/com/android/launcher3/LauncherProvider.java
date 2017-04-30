@@ -437,14 +437,13 @@ public class LauncherProvider extends ContentProvider {
         contentValues.put(Favorites._ID,id);
         contentValues.put(Favorites.INTENT, intent.toUri(0));
         contentValues.put(Favorites.TITLE, title);
-        //contentValues.put(Favorites.CONTAINER,-100);
-        /*contentValues.put(Favorites.SCREEN,1);
-        contentValues.put(Favorites.CELLX,0);
-        contentValues.put(Favorites.CELLY,0);
+        contentValues.put(Favorites.SCREEN,2);
+        contentValues.put(Favorites.CELLX,3);
+        contentValues.put(Favorites.CELLY,4);
         contentValues.put(Favorites.SPANX,1);
         contentValues.put(Favorites.SPANY,1);
         contentValues.put(Favorites.ITEM_TYPE,0);
-        contentValues.put(Favorites.APPWIDGET_ID,-1);*/
+        contentValues.put(Favorites.CONTAINER,Favorites.CONTAINER_DESKTOP);
         return contentValues;
     }
 
