@@ -402,10 +402,51 @@ public class LauncherProvider extends ContentProvider {
                 //mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(), getDefaultLayoutParser());
             }
 
+            //Fetch all apps
+            Intent startupIntent = new Intent(Intent.ACTION_MAIN);
+            startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+            PackageManager pm = getContext().getPackageManager();
+            List<ResolveInfo> activities = pm.queryIntentActivities(startupIntent, 0);
+
+            Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(0).activityInfo.packageName, activities.get(0).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            ContentValues contentValues=generateContentValues(19,activities.get(0).loadLabel(pm).toString(),intent);
+            dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_FAVORITES,null,contentValues);
+            //db.insert(TABLE_FAVORITES,null,contentValues);
+            //insertAndCheck(db,contentValues);
+
+            /*for(int i=0;i<activities.size();i++){
+                Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(i).activityInfo.packageName, activities.get(i).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ContentValues contentValues=generateContentValues(activities.get(i).loadLabel(pm).toString(),intent);
+                //db.insert("favorites",null,contentValues);
+                insertAndCheck(db,contentValues);
+            }
+            ///////////////////////////////
+            */
             clearFlagEmptyDbCreated();
         }
     }
-
+    private ContentValues generateWorkSpaceContentValues(long id) {
+        ContentValues contentValues=new ContentValues();
+        contentValues.put(LauncherSettings.WorkspaceScreens._ID,id);
+        contentValues.put(LauncherSettings.WorkspaceScreens.SCREEN_RANK,id-1);
+        return contentValues;
+    }
+    private ContentValues generateContentValues(long id,String title, Intent intent) {
+        ContentValues contentValues=new ContentValues();
+        contentValues.put(Favorites._ID,id);
+        contentValues.put(Favorites.INTENT, intent.toUri(0));
+        contentValues.put(Favorites.TITLE, title);
+        //contentValues.put(Favorites.CONTAINER,-100);
+        /*contentValues.put(Favorites.SCREEN,1);
+        contentValues.put(Favorites.CELLX,0);
+        contentValues.put(Favorites.CELLY,0);
+        contentValues.put(Favorites.SPANX,1);
+        contentValues.put(Favorites.SPANY,1);
+        contentValues.put(Favorites.ITEM_TYPE,0);
+        contentValues.put(Favorites.APPWIDGET_ID,-1);*/
+        return contentValues;
+    }
 
     /**
      * Creates workspace loader from an XML resource listed in the app restrictions.
@@ -827,27 +868,7 @@ public class LauncherProvider extends ContentProvider {
 
         }
 
-        private ContentValues generateWorkSpaceContentValues(long id) {
-            ContentValues contentValues=new ContentValues();
-            contentValues.put(LauncherSettings.WorkspaceScreens._ID,id);
-            contentValues.put(LauncherSettings.WorkspaceScreens.SCREEN_RANK,id-1);
-            return contentValues;
-        }
-        private ContentValues generateContentValues(long id,String title, Intent intent) {
-            ContentValues contentValues=new ContentValues();
-            contentValues.put(Favorites._ID,id);
-            contentValues.put(Favorites.INTENT, intent.toUri(0));
-            contentValues.put(Favorites.TITLE, title);
-            //contentValues.put(Favorites.CONTAINER,-100);
-            contentValues.put(Favorites.SCREEN,1);
-            contentValues.put(Favorites.CELLX,0);
-            contentValues.put(Favorites.CELLY,0);
-            contentValues.put(Favorites.SPANX,1);
-            contentValues.put(Favorites.SPANY,1);
-            contentValues.put(Favorites.ITEM_TYPE,0);
-            contentValues.put(Favorites.APPWIDGET_ID,-1);
-            return contentValues;
-        }
+
         /**
          * Replaces all shortcuts of type {@link Favorites#ITEM_TYPE_SHORTCUT} which have a valid
          * launcher activity target with {@link Favorites#ITEM_TYPE_APPLICATION}.
@@ -1284,30 +1305,7 @@ public class LauncherProvider extends ContentProvider {
             mMaxItemId = initializeMaxItemId(db);
             mMaxScreenId = initializeMaxScreenId(db);
 
-            /*
-            //creating workspace
-            Log.e(TAG,"creating workspace"+db.insert(TABLE_WORKSPACE_SCREENS,null,generateWorkSpaceContentValues(1)));
-            */
-            //Fetch all apps
-            /*Intent startupIntent = new Intent(Intent.ACTION_MAIN);
-            startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
-            PackageManager pm = mContext.getPackageManager();
-            List<ResolveInfo> activities = pm.queryIntentActivities(startupIntent, 0);
-
-            Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(0).activityInfo.packageName, activities.get(0).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            ContentValues contentValues=generateContentValues(initializeMaxItemId(db),activities.get(0).loadLabel(pm).toString(),intent);
-            db.insert(TABLE_FAVORITES,null,contentValues);*/
-            //insertAndCheck(db,contentValues);
-
-            /*for(int i=0;i<activities.size();i++){
-                Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(i).activityInfo.packageName, activities.get(i).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                ContentValues contentValues=generateContentValues(activities.get(i).loadLabel(pm).toString(),intent);
-                //db.insert("favorites",null,contentValues);
-                insertAndCheck(db,contentValues);
-            }
-            ///////////////////////////////
-            */
             return count;
         }
 

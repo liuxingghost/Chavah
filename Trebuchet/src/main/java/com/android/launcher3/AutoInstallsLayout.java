@@ -76,13 +76,12 @@ public class AutoInstallsLayout {
                 appWidgetHost, callback);
     }
 
-    static AutoInstallsLayout get(Context context, String pkg, Resources targetRes,
-            AppWidgetHost appWidgetHost, LayoutParserCallback callback) {
+    static AutoInstallsLayout get(Context context, String pkg, Resources targetRes, AppWidgetHost appWidgetHost, LayoutParserCallback callback) {
         InvariantDeviceProfile grid = LauncherAppState.getInstance().getInvariantDeviceProfile();
 
         // Try with grid size and hotseat count
         String layoutName = String.format(Locale.ENGLISH, FORMATTED_LAYOUT_RES_WITH_HOSTEAT,
-                (int) grid.numColumns, (int) grid.numRows, (int) grid.numHotseatIcons);
+                grid.numColumns,grid.numRows, (int) grid.numHotseatIcons);
         int layoutId = targetRes.getIdentifier(layoutName, "xml", pkg);
 
         // Try with only grid size
@@ -90,7 +89,7 @@ public class AutoInstallsLayout {
             Log.d(TAG, "Formatted layout: " + layoutName
                     + " not found. Trying layout without hosteat");
             layoutName = String.format(Locale.ENGLISH, FORMATTED_LAYOUT_RES,
-                    (int) grid.numColumns, (int) grid.numRows);
+                     grid.numColumns, grid.numRows);
             layoutId = targetRes.getIdentifier(layoutName, "xml", pkg);
         }
 
@@ -104,8 +103,7 @@ public class AutoInstallsLayout {
             Log.e(TAG, "Layout definition not found in package: " + pkg);
             return null;
         }
-        return new AutoInstallsLayout(context, appWidgetHost, callback, targetRes, layoutId,
-                TAG_WORKSPACE);
+        return new AutoInstallsLayout(context, appWidgetHost, callback, targetRes, layoutId, TAG_WORKSPACE);
     }
 
     // Object Tags
@@ -164,8 +162,7 @@ public class AutoInstallsLayout {
     public AutoInstallsLayout(Context context, AppWidgetHost appWidgetHost,
             LayoutParserCallback callback, Resources res,
             int layoutId, String rootTag) {
-        this(context, appWidgetHost, callback, res, layoutId, rootTag,
-                LauncherAppState.getInstance().getInvariantDeviceProfile().hotseatAllAppsRank);
+        this(context, appWidgetHost, callback, res, layoutId, rootTag, LauncherAppState.getInstance().getInvariantDeviceProfile().hotseatAllAppsRank);
     }
 
     public AutoInstallsLayout(Context context, AppWidgetHost appWidgetHost,
@@ -200,8 +197,7 @@ public class AutoInstallsLayout {
     /**
      * Parses the layout and returns the number of elements added on the homescreen.
      */
-    protected int parseLayout(int layoutId, ArrayList<Long> screenIds)
-            throws XmlPullParserException, IOException {
+    protected int parseLayout(int layoutId, ArrayList<Long> screenIds) throws XmlPullParserException, IOException {
         XmlResourceParser parser = mSourceRes.getXml(layoutId);
         beginDocument(parser, mRootTag);
         final int depth = parser.getDepth();
