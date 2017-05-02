@@ -47,9 +47,7 @@ public class DeleteDropTarget extends ButtonDropTarget {
     }
 
     public static boolean supportsDrop(Object info) {
-        return (info instanceof ShortcutInfo)
-                || (info instanceof LauncherAppWidgetInfo)
-                || (info instanceof FolderInfo);
+        return info instanceof LauncherAppWidgetInfo;
     }
 
     @Override
