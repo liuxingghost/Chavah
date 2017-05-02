@@ -64,6 +64,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 public class LauncherProvider extends ContentProvider {
+    private static final String PACKAGE="com.android.chavah";
     private static final String TAG = "LauncherProvider";
     private static final boolean LOGD = false;
 
@@ -422,6 +423,11 @@ public class LauncherProvider extends ContentProvider {
             int cellY=0;
 
             for(int i=0;i<activities.size();i++){
+                //Пропускаем значок этого приложения, а также приложение Leaks не понятное для чего предназначенное
+                if(PACKAGE.equals(activities.get(i).activityInfo.packageName)) {
+                    continue;
+                }
+
                 Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(i).activityInfo.packageName, activities.get(i).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 ContentValues contentValues=generateContentValues(getMaxId(mOpenHelper.getWritableDatabase(),TABLE_FAVORITES)+1,activities.get(i).loadLabel(pm).toString(),intent,screen,cellX,cellY,Favorites.CONTAINER_DESKTOP);
                 dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_FAVORITES,null,contentValues);

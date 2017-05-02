@@ -162,6 +162,7 @@
         </activity>
 
         <!-- Debugging tools -->
+
         <activity
             android:name="com.android.chavah.MemoryDumpActivity"
             android:theme="@android:style/Theme.NoDisplay"
