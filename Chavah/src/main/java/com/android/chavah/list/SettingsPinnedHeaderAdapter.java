@@ -121,93 +121,24 @@ public class SettingsPinnedHeaderAdapter extends PinnedHeaderListAdapter {
                         setSettingSwitch(stateView, settingSwitch, current);
                         break;
                     case 3:
-                        updateDynamicGridSizeSettingsItem(stateView, settingSwitch);
-                        break;
-                    case 4:
                         current = SettingsProvider.getBoolean(mContext,
                                 SettingsProvider.SETTINGS_UI_ALLOW_ROTATION,
                                 R.bool.preferences_interface_allow_rotation);
                         setSettingSwitch(stateView, settingSwitch, current);
                         break;
-                    case 5:
+                    case 4:
                         current = SettingsProvider.getBoolean(mContext,
                                 SettingsProvider.SETTINGS_UI_HOMESCREEN_REMOTE_FOLDER,
                                 R.bool.preferences_interface_homescreen_remote_folder_default);
                         setSettingSwitch(stateView, settingSwitch, current);
                         break;
-                    case 6:
+                    case 5:
                         updateWorkspaceAnimSettingsItem(stateView, settingSwitch);
                         break;
                     default:
                         hideStates(stateView, settingSwitch);
                 }
                 break;
-            case OverviewSettingsPanel.DRAWER_SETTINGS_POSITION:
-                switch (position) {
-                    case 0:
-                        current = SettingsProvider.getBoolean(mContext,
-                                SettingsProvider.SETTINGS_UI_DRAWER_HIDE_ICON_LABELS,
-                                R.bool.preferences_interface_drawer_hide_icon_labels_default);
-                        // Reversed logic here. Boolean is hideLabels, where setting is show labels
-                        setSettingSwitch(stateView, settingSwitch, !current);
-                        break;
-                    case 1:
-                        current = SettingsProvider.getBoolean(mContext,
-                                SettingsProvider.SETTINGS_UI_DRAWER_STYLE_USE_COMPACT,
-                                R.bool.preferences_interface_drawer_compact_default);
-                        state = current ? res.getString(R.string.app_drawer_style_compact)
-                                : res.getString(R.string.app_drawer_style_sections);
-                        setStateText(stateView, settingSwitch, state);
-                        break;
-                    case 2:
-                        current = SettingsProvider.getBoolean(mContext,
-                                SettingsProvider.SETTINGS_UI_DRAWER_DARK,
-                                R.bool.preferences_interface_drawer_dark_default);
-                        state = current ? res.getString(R.string.app_drawer_color_dark)
-                                : res.getString(R.string.app_drawer_color_light);
-                        setStateText(stateView, settingSwitch, state);
-                        break;
-                    case 3:
-                        current = SettingsProvider.getBoolean(mContext,
-                                SettingsProvider.SETTINGS_UI_USE_SCROLLER,
-                                R.bool.preferences_interface_use_scroller_default);
-                        setSettingSwitch(stateView, settingSwitch, current);
-                        break;
-                    case 4:
-                        current = SettingsProvider.getBoolean(mContext,
-                                SettingsProvider.SETTINGS_UI_USE_HORIZONTAL_SCRUBBER,
-                                R.bool.preferences_interface_use_horizontal_scrubber_default);
-                        state = current ? res.getString(R.string.fast_scroller_type_horizontal)
-                                : res.getString(R.string.fast_scroller_type_vertical);
-                        setStateText(stateView, settingSwitch, state);
-                        break;
-                    case 5:
-                        current = SettingsProvider.getBoolean(mContext,
-                                SettingsProvider.SETTINGS_UI_DRAWER_SEARCH,
-                                R.bool.preferences_interface_drawer_search_default);
-                        setSettingSwitch(stateView, settingSwitch, current);
-                        break;
-                    case 6:
-                        current = SettingsProvider.getBoolean(mContext,
-                                SettingsProvider.SETTINGS_UI_DRAWER_REMOTE_APPS,
-                                R.bool.preferences_interface_drawer_remote_apps_default);
-                        setSettingSwitch(stateView, settingSwitch, current);
-                        break;
-                    default:
-                        hideStates(stateView, settingSwitch);
-                }
-                break;
-            case OverviewSettingsPanel.APP_SETTINGS_POSITION:
-                switch (position) {
-                    case 0:
-                        current = SettingsProvider.getBoolean(mContext,
-                                SettingsProvider.SETTINGS_UI_GENERAL_ICONS_LARGE,
-                                R.bool.preferences_interface_general_icons_large_default);
-                        setSettingSwitch(stateView, settingSwitch, current);
-                        break;
-                    default:
-                        hideStates(stateView, settingSwitch);
-                }
         }
 
         v.setOnClickListener(mSettingsItemListener);
@@ -294,9 +225,6 @@ public class SettingsPinnedHeaderAdapter extends PinnedHeaderListAdapter {
                             mLauncher.reloadLauncher(false, false);
                             break;
                         case 3:
-                            mLauncher.onClickDynamicGridSizeButton();
-                            break;
-                        case 4:
                             String key = SettingsProvider.SETTINGS_UI_ALLOW_ROTATION;
                             boolean newValue = onSettingsBooleanChanged(v, key,
                                     R.bool.preferences_interface_allow_rotation, false);
@@ -311,88 +239,18 @@ public class SettingsPinnedHeaderAdapter extends PinnedHeaderListAdapter {
                                     key, extras);
 
                             break;
-                        case 5:
+                        case 4:
                             onSettingsBooleanChanged(v,
                                     SettingsProvider.SETTINGS_UI_HOMESCREEN_REMOTE_FOLDER,
                                     R.bool.preferences_interface_homescreen_remote_folder_default,
                                     false);
                             mLauncher.getRemoteFolderManager().onSettingChanged();
                             break;
-                        case 6:
+                        case 5:
                             mLauncher.onClickEffectSettingButton();
                             break;
                     }
                     break;
-                case OverviewSettingsPanel.DRAWER_SETTINGS_POSITION:
-                    switch (position) {
-                        case 0:
-                            onSettingsBooleanChanged(v,
-                                    SettingsProvider.SETTINGS_UI_DRAWER_HIDE_ICON_LABELS,
-                                    R.bool.preferences_interface_drawer_hide_icon_labels_default,
-                                    true);
-                            mLauncher.reloadAppDrawer();
-                            break;
-                        case 1:
-                            onTextSettingsBooleanChanged(v,
-                                    SettingsProvider.SETTINGS_UI_DRAWER_STYLE_USE_COMPACT,
-                                    R.bool.preferences_interface_drawer_compact_default,
-                                    R.string.app_drawer_style_compact,
-                                    R.string.app_drawer_style_sections);
-                            mLauncher.reloadAppDrawer();
-                            break;
-                        case 2:
-                            onTextSettingsBooleanChanged(v,
-                                    SettingsProvider.SETTINGS_UI_DRAWER_DARK,
-                                    R.bool.preferences_interface_drawer_dark_default,
-                                    R.string.app_drawer_color_dark,
-                                    R.string.app_drawer_color_light);
-                            mLauncher.reloadAppDrawer();
-                            break;
-                        case 3:
-                            onSettingsBooleanChanged(v,
-                                    SettingsProvider.SETTINGS_UI_USE_SCROLLER,
-                                    R.bool.preferences_interface_use_scroller_default, false);
-                            mLauncher.reloadAppDrawer();
-                            mLauncher.reloadWidgetView();
-                            break;
-                        case 4:
-                            onTextSettingsBooleanChanged(v,
-                                    SettingsProvider.SETTINGS_UI_USE_HORIZONTAL_SCRUBBER,
-                                    R.bool.preferences_interface_use_horizontal_scrubber_default,
-                                    R.string.fast_scroller_type_horizontal,
-                                    R.string.fast_scroller_type_vertical);
-                            mLauncher.reloadAppDrawer();
-                            mLauncher.reloadWidgetView();
-                            break;
-                        case 5:
-                            onSettingsBooleanChanged(v,
-                                    SettingsProvider.SETTINGS_UI_DRAWER_SEARCH,
-                                    R.bool.preferences_interface_drawer_search_default, false);
-                            mLauncher.reloadAppDrawer();
-                            break;
-                        case 6:
-                            onSettingsBooleanChanged(v,
-                                    SettingsProvider.SETTINGS_UI_DRAWER_REMOTE_APPS,
-                                    R.bool.preferences_interface_drawer_remote_apps_default, false);
-                            mLauncher.getRemoteFolderManager().onSettingChanged();
-                            break;
-                    }
-                    break;
-                case OverviewSettingsPanel.APP_SETTINGS_POSITION:
-                    switch (position) {
-                        case 0:
-                            onSettingsBooleanChanged(v,
-                                    SettingsProvider.SETTINGS_UI_GENERAL_ICONS_LARGE,
-                                    R.bool.preferences_interface_general_icons_large_default, false);
-                            mLauncher.reloadLauncher(true, true);
-                            break;
-                        case 1:
-                            Intent intent = new Intent();
-                            intent.setClassName(OverviewSettingsPanel.ANDROID_SETTINGS,
-                                    OverviewSettingsPanel.ANDROID_PROTECTED_APPS);
-                            mLauncher.startActivity(intent);
-                            break;
-                    }
             }
 
             View defaultHome = mLauncher.findViewById(R.id.default_home_screen_panel);
