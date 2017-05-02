@@ -1,6 +1,6 @@
 # Chavah
-<img src="https://pp.userapi.com/c836535/v836535288/3271d/NzeJPoteA4g.jpg" alt="Drawing" style="width: 200px;"/>
-<img src="https://pp.userapi.com/c836535/v836535288/32727/0en0hDkwzaY.jpg" alt="Drawing" style="width: 200px;"/>
+<img src="https://pp.userapi.com/c836535/v836535288/3271d/NzeJPoteA4g.jpg" alt="Drawing" style="width: 150px;"/>
+<img src="https://pp.userapi.com/c836535/v836535288/32727/0en0hDkwzaY.jpg" alt="Drawing" style="width: 150px;"/>
 <br>
 Launcher like iOS Launcher with Android style based on <a href="https://github.com/LineageOS/android_packages_apps_Trebuchet">Trebuchet Launcher</a>
 

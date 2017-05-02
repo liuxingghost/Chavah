@@ -75,8 +75,6 @@ public class LauncherProvider extends ContentProvider {
     static final String TABLE_WORKSPACE_SCREENS = LauncherSettings.WorkspaceScreens.TABLE_NAME;
     static final String EMPTY_DATABASE_CREATED = "EMPTY_DATABASE_CREATED";
 
-    static int MAX_CELL_X=5;
-    static int MAX_CELL_Y=5;
 
     private static final String RESTRICTION_PACKAGE_NAME = "workspace.configuration.package.name";
 
@@ -403,42 +401,40 @@ public class LauncherProvider extends ContentProvider {
                 //mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(), getDefaultLayoutParser());
             //}
 
-            //Получаем список всех приложений
             /*
-             !!!Внимание опытным путем выяснено что вначале нужно создать хотя бы один значак а потом добавлять экран!!!
-                то тоесть нельзя создать экран пока он пустой
-              */
+             Внимание опытным путем выяснено что вначале нужно
+             создать хотя бы один значак а потом добавлять экран
+             то тоесть нельзя создать экран пока он пустой
+            */
+            //Получаем список всех приложений
             Intent startupIntent = new Intent(Intent.ACTION_MAIN);
             startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
             PackageManager pm = getContext().getPackageManager();
             List<ResolveInfo> activities = pm.queryIntentActivities(startupIntent, 0);
 
-            //Вначале добавляем ярлыки на нижнию панель
-            for(int i=0;i<Math.min(MAX_CELL_X,activities.size());i++){
-                Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(i).activityInfo.packageName, activities.get(i).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                ContentValues contentValues=generateContentValues(getMaxId(mOpenHelper.getWritableDatabase(),TABLE_FAVORITES)+1,activities.get(i).loadLabel(pm).toString(),intent,i,i,0,Favorites.CONTAINER_HOTSEAT);
-                dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_FAVORITES,null,contentValues);
-            }
-
             //Начинаем добавлять все приложения на рабочий стол
+            LauncherAppState appState=LauncherAppState.getInstance();
+            InvariantDeviceProfile invariantDeviceProfile=appState.getInvariantDeviceProfile();
+            int countN=invariantDeviceProfile.numRows;
+            int countM=invariantDeviceProfile.numColumns;
             int screen=1;
             int cellX=0;
             int cellY=0;
 
-            for(int i=MAX_CELL_X;i<activities.size();i++){
+            for(int i=0;i<activities.size();i++){
                 Intent intent = new Intent(Intent.ACTION_MAIN).setClassName(activities.get(i).activityInfo.packageName, activities.get(i).activityInfo.name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 ContentValues contentValues=generateContentValues(getMaxId(mOpenHelper.getWritableDatabase(),TABLE_FAVORITES)+1,activities.get(i).loadLabel(pm).toString(),intent,screen,cellX,cellY,Favorites.CONTAINER_DESKTOP);
                 dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_FAVORITES,null,contentValues);
 
                 //Если мы заполнили экран добавляем экран и обнуляем значения расположений новых значков
-                if(cellX==MAX_CELL_X-1 && cellY==MAX_CELL_Y-1){
+                if(cellX==countM-1 && cellY==countN-1){
                     cellX=0;
                     cellY=0;
                     dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_WORKSPACE_SCREENS,null,generateWorkSpaceContentValues(screen));
                     screen++;
                 }
                 //Если мы долши до правого края экрана
-                else if(cellX==MAX_CELL_X-1){
+                else if(cellX==countM-1){
                     cellX=0;
                     cellY++;
                 }
@@ -451,7 +447,6 @@ public class LauncherProvider extends ContentProvider {
             //Здесь все просто, если мы только что перешли на новый экран то cellX и cellY должы быть равны 0
             //Если это не так то это означает лишь что есть еще не сгенерированный экран
             dbInsertAndCheck(mOpenHelper,mOpenHelper.getWritableDatabase(),TABLE_WORKSPACE_SCREENS,null,generateWorkSpaceContentValues(screen));
-            screen++;
 
             clearFlagEmptyDbCreated();
         }
