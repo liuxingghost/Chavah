@@ -545,7 +545,7 @@ public class LauncherProvider extends ContentProvider {
         mOpenHelper.mListener = mListener;
     }
 
-    private static class DatabaseHelper extends SQLiteOpenHelper implements LayoutParserCallback {
+    public static class DatabaseHelper extends SQLiteOpenHelper implements LayoutParserCallback {
         private final Context mContext;
         @Thunk final AppWidgetHost mAppWidgetHost;
         private long mMaxItemId = -1;
