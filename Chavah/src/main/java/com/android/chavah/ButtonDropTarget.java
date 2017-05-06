@@ -186,6 +186,8 @@ public abstract class ButtonDropTarget extends TextView
 
 	@Override
     public final void onDragStart(DragSource source, Object info, int dragAction) {
+        if(mLauncher.mSearchView!=null)
+            mLauncher.mSearchView.setVisibility(INVISIBLE);
         mActive = supportsDrop(source, info);
         mDrawable.setColorFilter(null);
         if (mCurrentColorAnim != null) {
@@ -210,6 +212,9 @@ public abstract class ButtonDropTarget extends TextView
 
     @Override
     public void onDragEnd() {
+        if(mLauncher.mSearchView!=null) {
+            mLauncher.mSearchView.setVisibility(VISIBLE);
+        }
         mActive = false;
     }
 

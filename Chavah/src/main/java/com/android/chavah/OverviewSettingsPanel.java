@@ -59,7 +59,6 @@ public class OverviewSettingsPanel {
     private String[] getValuesHome() {
         Resources res = mLauncher.getResources();
         ArrayList<String> values = new ArrayList<String>(Arrays.asList(new String[]{
-                res.getString(R.string.home_screen_search_text),
                 res.getString(R.string.icon_labels),
                 res.getString(R.string.scrolling_wallpaper),
                 res.getString(R.string.allow_rotation_title),

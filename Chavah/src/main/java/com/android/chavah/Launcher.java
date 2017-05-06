@@ -50,6 +50,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -70,6 +71,8 @@ import android.os.Message;
 import android.os.StrictMode;
 import android.os.SystemClock;
 import android.os.UserHandle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Selection;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -94,11 +97,7 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Advanceable;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import com.android.chavah.DropTarget.DragObject;
 import com.android.chavah.PagedView.PageSwitchListener;
@@ -126,12 +125,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -388,6 +382,11 @@ public class Launcher extends Activity
 
     private long mDefaultScreenId;
 
+    public SearchView mSearchView;
+    private RecyclerView mSearchRecyclerView;
+    private SearchActivityAdapter mSearchRecyclerViewAdapter;
+    private List<ResolveInfo> mSearchActivities;
+
     public Animator.AnimatorListener mAnimatorListener = new Animator.AnimatorListener() {
         @Override
         public void onAnimationStart(Animator arg0) {}
@@ -506,6 +505,7 @@ public class Launcher extends Activity
         }
 
         super.onCreate(savedInstanceState);
+
 
         LauncherAppState.setApplicationContext(getApplicationContext());
         LauncherAppState app = LauncherAppState.getInstance();
@@ -1508,8 +1508,111 @@ public class Launcher extends Activity
     /**
      * Finds all the views we need and configure them properly.
      */
+
+    private class SearchActivityHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
+        private ResolveInfo mResolveInfo;
+        private TextView mNameTextView;
+        private ImageView mImageView;
+
+        public SearchActivityHolder(View itemView) {
+            super(itemView);
+            mNameTextView = (TextView) itemView.findViewById(R.id.search_item_title);
+            mImageView=(ImageView)itemView.findViewById(R.id.search_item_icon);
+            itemView.setOnClickListener(this);
+        }
+
+        public void bindActivity(ResolveInfo resolveInfo) {
+            mResolveInfo = resolveInfo;
+            PackageManager pm = getPackageManager();
+            String appName = mResolveInfo.loadLabel(pm).toString();
+            mNameTextView.setText(appName);
+            mImageView.setImageDrawable(resolveInfo.loadIcon(pm));
+        }
+
+        @Override
+        public void onClick(View v) {
+            ActivityInfo activityInfo = mResolveInfo.activityInfo;
+
+            Intent i = new Intent(Intent.ACTION_MAIN)
+                    .setClassName(activityInfo.applicationInfo.packageName,
+                            activityInfo.name)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            startActivity(i);
+        }
+    }
+
+    private class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityHolder> {
+        private final List<ResolveInfo> mActivities;
+
+        public SearchActivityAdapter(List<ResolveInfo> activities) {
+            mActivities = activities;
+        }
+
+        @Override
+        public SearchActivityHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(Launcher.this);
+            View view = layoutInflater.inflate(R.layout.search_item, parent, false);
+            return new SearchActivityHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(SearchActivityHolder activityHolder, int position) {
+            ResolveInfo resolveInfo = mActivities.get(position);
+            activityHolder.bindActivity(resolveInfo);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mActivities.size();
+        }
+    }
+
     private void setupViews() {
         final DragController dragController = mDragController;
+
+        mSearchRecyclerView =(RecyclerView)findViewById(R.id.home_screen_search_result);
+        if(mSearchRecyclerView!=null) {
+            mSearchActivities = new ArrayList<>();
+            mSearchRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            mSearchRecyclerViewAdapter = new SearchActivityAdapter(mSearchActivities);
+            mSearchRecyclerView.setAdapter(mSearchRecyclerViewAdapter);
+        }
+
+        //Строка поиска главного экрана
+        mSearchView=(SearchView)findViewById(R.id.home_screen_search_bar);
+        if(mSearchView!=null) {
+            mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    if (newText.length() == 0) {
+                        mSearchRecyclerView.setVisibility(View.INVISIBLE);
+                        return false;
+                    }
+                    mSearchRecyclerView.setVisibility(View.VISIBLE);
+
+                    Intent startupIntent = new Intent(Intent.ACTION_MAIN);
+                    startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                    PackageManager pm = getPackageManager();
+                    List<ResolveInfo> allActivities = pm.queryIntentActivities(startupIntent, 0);
+
+                    newText = newText.toLowerCase();
+                    mSearchActivities.clear();
+                    for (int i = 0; i < allActivities.size(); i++) {
+                        if (allActivities.get(i).loadLabel(pm).toString().toLowerCase().startsWith(newText))
+                            mSearchActivities.add(allActivities.get(i));
+                    }
+                    mSearchRecyclerViewAdapter.notifyDataSetChanged();
+                    return false;
+                }
+            });
+        }
 
         mLauncherView = findViewById(R.id.launcher);
         mFocusHandler = (FocusIndicatorView) findViewById(R.id.focus_indicator);
@@ -3863,6 +3966,8 @@ public class Launcher extends Activity
     }
 
     void showOverviewMode(boolean animated) {
+        if(mSearchView!=null)
+            mSearchView.setVisibility(View.INVISIBLE);
         mWorkspace.setVisibility(View.VISIBLE);
         mStateTransitionAnimation.startAnimationToWorkspace(mState, mWorkspace.getState(),
                 Workspace.State.OVERVIEW,
@@ -4030,7 +4135,7 @@ public class Launcher extends Activity
     }
 
     public View getOrCreateQsbBar() {
-        if (mLauncherCallbacks != null && mLauncherCallbacks.providesSearch()) {
+        /*if (mLauncherCallbacks != null && mLauncherCallbacks.providesSearch()) {
             return mLauncherCallbacks.getQsbBar();
         }
 
@@ -4068,9 +4173,9 @@ public class Launcher extends Activity
                 }
 
                 sp.edit()
-                    .putInt(QSB_WIDGET_ID, widgetId)
-                    .putString(QSB_WIDGET_PROVIDER, searchProvider.provider.flattenToString())
-                    .commit();
+                        .putInt(QSB_WIDGET_ID, widgetId)
+                        .putString(QSB_WIDGET_PROVIDER, searchProvider.provider.flattenToString())
+                        .commit();
             }
 
             mAppWidgetHost.setQsbWidgetId(widgetId);
@@ -4083,7 +4188,8 @@ public class Launcher extends Activity
                 mSearchDropTargetBar.setQsbSearchBar(mQsb);
             }
         }
-        return mQsb;
+        return mQsb;*/
+        return null;
     }
 
     private void reinflateQSBIfNecessary() {

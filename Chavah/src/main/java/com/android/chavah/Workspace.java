@@ -60,6 +60,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.TextView;
 
+import android.widget.Toast;
 import com.android.chavah.FolderIcon.FolderRingAnimator;
 import com.android.chavah.Launcher.CustomContentCallbacks;
 import com.android.chavah.Launcher.LauncherOverlay;
@@ -2029,6 +2030,8 @@ public class Workspace extends PagedView
     }
 
     public void exitOverviewMode() {
+        if(mLauncher.mSearchView!=null)
+            mLauncher.mSearchView.setVisibility(VISIBLE);
         ((OverviewPanel) mLauncher.getOverviewPanel()).collapsePane();
         reloadSettings();
     }

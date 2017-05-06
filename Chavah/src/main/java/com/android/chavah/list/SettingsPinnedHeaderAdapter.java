@@ -103,36 +103,30 @@ public class SettingsPinnedHeaderAdapter extends PinnedHeaderListAdapter {
                 switch (position) {
                     case 0:
                         current = SettingsProvider.getBoolean(mContext,
-                                SettingsProvider.SETTINGS_UI_HOMESCREEN_SEARCH,
-                                R.bool.preferences_interface_homescreen_search_default);
-                        setSettingSwitch(stateView, settingSwitch, current);
-                        break;
-                    case 1:
-                        current = SettingsProvider.getBoolean(mContext,
                                 SettingsProvider.SETTINGS_UI_HOMESCREEN_HIDE_ICON_LABELS,
                                 R.bool.preferences_interface_homescreen_hide_icon_labels_default);
                         // Reversed logic here. Boolean is hideLabels, where setting is show labels
                         setSettingSwitch(stateView, settingSwitch, !current);
                         break;
-                    case 2:
+                    case 1:
                         current = SettingsProvider.getBoolean(mContext,
                                 SettingsProvider.SETTINGS_UI_HOMESCREEN_SCROLLING_WALLPAPER_SCROLL,
                                 R.bool.preferences_interface_homescreen_scrolling_wallpaper_scroll_default);
                         setSettingSwitch(stateView, settingSwitch, current);
                         break;
-                    case 3:
+                    case 2:
                         current = SettingsProvider.getBoolean(mContext,
                                 SettingsProvider.SETTINGS_UI_ALLOW_ROTATION,
                                 R.bool.preferences_interface_allow_rotation);
                         setSettingSwitch(stateView, settingSwitch, current);
                         break;
-                    case 4:
+                    case 3:
                         current = SettingsProvider.getBoolean(mContext,
                                 SettingsProvider.SETTINGS_UI_HOMESCREEN_REMOTE_FOLDER,
                                 R.bool.preferences_interface_homescreen_remote_folder_default);
                         setSettingSwitch(stateView, settingSwitch, current);
                         break;
-                    case 5:
+                    case 4:
                         updateWorkspaceAnimSettingsItem(stateView, settingSwitch);
                         break;
                     default:
