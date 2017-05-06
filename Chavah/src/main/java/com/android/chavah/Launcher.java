@@ -386,6 +386,7 @@ public class Launcher extends Activity
     private RecyclerView mSearchRecyclerView;
     private SearchActivityAdapter mSearchRecyclerViewAdapter;
     private List<ResolveInfo> mSearchActivities;
+    private List<ResolveInfo>mAllApps;
 
     public Animator.AnimatorListener mAnimatorListener = new Animator.AnimatorListener() {
         @Override
@@ -1572,6 +1573,12 @@ public class Launcher extends Activity
     private void setupViews() {
         final DragController dragController = mDragController;
 
+
+        Intent startupIntent = new Intent(Intent.ACTION_MAIN);
+        startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PackageManager pm = getPackageManager();
+        mAllApps = pm.queryIntentActivities(startupIntent, 0);
+
         mSearchRecyclerView =(RecyclerView)findViewById(R.id.home_screen_search_result);
         if(mSearchRecyclerView!=null) {
             mSearchActivities = new ArrayList<>();
@@ -1597,16 +1604,11 @@ public class Launcher extends Activity
                     }
                     mSearchRecyclerView.setVisibility(View.VISIBLE);
 
-                    Intent startupIntent = new Intent(Intent.ACTION_MAIN);
-                    startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-                    PackageManager pm = getPackageManager();
-                    List<ResolveInfo> allActivities = pm.queryIntentActivities(startupIntent, 0);
-
                     newText = newText.toLowerCase();
                     mSearchActivities.clear();
-                    for (int i = 0; i < allActivities.size(); i++) {
-                        if (allActivities.get(i).loadLabel(pm).toString().toLowerCase().startsWith(newText))
-                            mSearchActivities.add(allActivities.get(i));
+                    for (int i = 0; i < mAllApps.size(); i++) {
+                        if (mAllApps.get(i).loadLabel(getPackageManager()).toString().toLowerCase().startsWith(newText))
+                            mSearchActivities.add(mAllApps.get(i));
                     }
                     mSearchRecyclerViewAdapter.notifyDataSetChanged();
                     return false;

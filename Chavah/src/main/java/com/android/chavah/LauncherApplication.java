@@ -40,7 +40,7 @@ public class LauncherApplication extends Application {
         super.onCreate();
         sLauncherStats = LauncherStats.getInstance(this);
         AggregationIntentService.scheduleService(this);
-        LeakCanary.install(this);
+        //LeakCanary.install(this);
     }
 
 }

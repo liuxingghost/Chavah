@@ -5,9 +5,9 @@
               android:layout_height="wrap_content"
               android:padding="8dp"
 >
-  <ImageView android:layout_width="wrap_content"
+  <ImageView android:layout_width="48dp"
              android:layout_weight="0"
-             android:layout_height="match_parent"
+             android:layout_height="48dp"
              android:src="@drawable/all_apps_button_icon"
              android:id="@+id/search_item_icon"
   />
