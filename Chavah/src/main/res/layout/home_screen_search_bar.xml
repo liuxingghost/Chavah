@@ -8,11 +8,12 @@
             android:layout_height="55dp"
             android:queryHint="@string/all_apps_search_bar_hint"
             android:background="#F3F3F3"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp"
             android:layout_marginTop="12dp"
             android:id="@+id/home_screen_search_bar"
             android:iconifiedByDefault="false"
+            android:focusable="false"
     />
 
     <android.support.v7.widget.RecyclerView
@@ -22,8 +23,8 @@
             android:background="#FFF"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp"
             android:visibility="visible"
     />
 </LinearLayout>

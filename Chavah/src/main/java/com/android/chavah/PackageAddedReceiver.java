@@ -60,14 +60,16 @@ public class PackageAddedReceiver extends BroadcastReceiver {
             cursor.moveToFirst();
             while(!cursor.isAfterLast()){
                 String intentString=cursor.getString(0);
-                String searchString="component=";
-                int i=intentString.indexOf(searchString)+searchString.length();
-                String currentPackageName="";
-                while (i<intentString.length()&&intentString.charAt(i)!='/'){
-                    currentPackageName+=intentString.charAt(i++);
-                }
-                if(packageName.equals(currentPackageName)){
-                    return true;
+                if(intentString!=null) {
+                    String searchString = "component=";
+                    int i = intentString.indexOf(searchString) + searchString.length();
+                    String currentPackageName = "";
+                    while (i < intentString.length() && intentString.charAt(i) != '/') {
+                        currentPackageName += intentString.charAt(i++);
+                    }
+                    if (packageName.equals(currentPackageName)) {
+                        return true;
+                    }
                 }
                 cursor.moveToNext();
             }
