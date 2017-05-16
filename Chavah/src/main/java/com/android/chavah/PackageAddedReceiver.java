@@ -16,21 +16,18 @@ import android.util.Log;
  */
 public class PackageAddedReceiver extends BroadcastReceiver {
     private static final String TAG="PackageAddedReceiver";
-    private static final String EXTRA_INSTALL_SHORTCUT="com.android.launcher.action.INSTALL_SHORTCUT_HIDDEN";
+    private static final String EXTRA_INSTALL_SHORTCUT="com.android.launcher.action.INSTALL_SHORTCUT";
 
     private Context mContext;
-    private SQLiteDatabase mDatabase;
     public void onReceive(Context context, Intent intent){
         Log.d(TAG,"onReceive: "+intent.getAction());
         mContext=context;
-        LauncherProvider.DatabaseHelper databaseHelper=new LauncherProvider.DatabaseHelper(mContext);
-        mDatabase=databaseHelper.getWritableDatabase();
         String packageName=intent.getDataString().split(":")[1];
         //Проверяем установлена ли уже программа, если да то не добавляем ее на главный экран
-        if(packageAlreadyInHome(packageName))
-            Log.d(TAG,"package already installed");
-        else
-            addShortcut(packageName);
+        //if(packageAlreadyInHome(packageName))
+        //    Log.d(TAG,"package already installed");
+        //else
+        addShortcut(packageName);
     }
     private void addShortcut(String intent){
         PackageManager manager=mContext.getPackageManager();
@@ -53,29 +50,5 @@ public class PackageAddedReceiver extends BroadcastReceiver {
         }catch (PackageManager.NameNotFoundException e){
             return true;
         }
-    }
-    private boolean packageAlreadyInHome(String packageName){
-        Cursor cursor=mDatabase.query(LauncherProvider.TABLE_FAVORITES,new String[]{ LauncherSettings.Favorites.INTENT},null,null,null,null,null);
-        try{
-            cursor.moveToFirst();
-            while(!cursor.isAfterLast()){
-                String intentString=cursor.getString(0);
-                if(intentString!=null) {
-                    String searchString = "component=";
-                    int i = intentString.indexOf(searchString) + searchString.length();
-                    String currentPackageName = "";
-                    while (i < intentString.length() && intentString.charAt(i) != '/') {
-                        currentPackageName += intentString.charAt(i++);
-                    }
-                    if (packageName.equals(currentPackageName)) {
-                        return true;
-                    }
-                }
-                cursor.moveToNext();
-            }
-        }finally {
-            cursor.close();
-        }
-        return false;
     }
 }

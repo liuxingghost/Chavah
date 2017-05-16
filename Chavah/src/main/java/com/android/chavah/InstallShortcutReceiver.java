@@ -23,6 +23,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
@@ -69,6 +71,8 @@ public class InstallShortcutReceiver extends BroadcastReceiver {
     public static final int NEW_SHORTCUT_STAGGER_DELAY = 85;
 
     private static final Object sLock = new Object();
+
+    private SQLiteDatabase mDatabase;
 
     private static void addToInstallQueue(
             SharedPreferences sharedPrefs, PendingInstallShortcutInfo info) {
@@ -141,17 +145,46 @@ public class InstallShortcutReceiver extends BroadcastReceiver {
     // processAllPendingInstalls() is called.
     private static boolean mUseInstallQueue = false;
 
+    private boolean packageAlreadyInHome(String packageName){
+        Cursor cursor=mDatabase.query(LauncherProvider.TABLE_FAVORITES,new String[]{ LauncherSettings.Favorites.INTENT},null,null,null,null,null);
+        try{
+            cursor.moveToFirst();
+            while(!cursor.isAfterLast()){
+                String intentString=cursor.getString(0);
+                if(intentString!=null) {
+                    String searchString = "component=";
+                    int i = intentString.indexOf(searchString) + searchString.length();
+                    String currentPackageName = "";
+                    while (i < intentString.length() && intentString.charAt(i) != '/') {
+                        currentPackageName += intentString.charAt(i++);
+                    }
+                    if (packageName.equals(currentPackageName)) {
+                        return true;
+                    }
+                }
+                cursor.moveToNext();
+            }
+        }finally {
+            cursor.close();
+        }
+        return false;
+    }
     public void onReceive(Context context, Intent data) {
         Log.d(TAG,"onReceive: "+data.getAction());
+
+        LauncherProvider.DatabaseHelper databaseHelper=new LauncherProvider.DatabaseHelper(context);
+        mDatabase=databaseHelper.getWritableDatabase();
 
         PendingInstallShortcutInfo info = new PendingInstallShortcutInfo(data, context);
         if (info.launchIntent == null || info.label == null) {
             if (DBG) Log.e(TAG, "Invalid install shortcut intent");
             return;
         }
-
-        info = convertToLauncherActivityIfPossible(info);
-        queuePendingShortcutInfo(info, context);
+        Log.d(TAG,"Adding app: "+info.launchIntent.getAction());
+        if(!info.launchIntent.getAction().endsWith("MAIN")||!packageAlreadyInHome(info.launchIntent.getPackage())) {
+            info = convertToLauncherActivityIfPossible(info);
+            queuePendingShortcutInfo(info, context);
+        }
     }
 
     public static ShortcutInfo fromShortcutIntent(Context context, Intent data) {

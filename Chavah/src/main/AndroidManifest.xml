@@ -200,13 +200,11 @@
 
         <!-- Intent received used to install shortcuts from other applications -->
 
-        <!--Why hidden? Because i already use PACKAGE_ADDED action and i do not want duplicate intents-->
-        <!--For example this can be when google play send intent-->
         <receiver
             android:name="com.android.chavah.InstallShortcutReceiver"
-            android:permission="com.android.launcher.permission.INSTALL_SHORTCUT_HIDDEN">
+            android:permission="com.android.launcher.permission.INSTALL_SHORTCUT">
             <intent-filter>
-                <action android:name="com.android.launcher.action.INSTALL_SHORTCUT_HIDDEN" />
+                <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
             </intent-filter>
         </receiver>
 

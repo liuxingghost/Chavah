@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 
@@ -47,7 +48,8 @@ public class DeleteDropTarget extends ButtonDropTarget {
     }
 
     public static boolean supportsDrop(Object info) {
-        return info instanceof LauncherAppWidgetInfo;
+        return (info instanceof ShortcutInfo && !info.toString().contains("android.intent.action.MAIN")||info instanceof LauncherAppWidgetInfo);
+
     }
 
     @Override
